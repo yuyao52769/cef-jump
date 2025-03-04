@@ -37,6 +37,9 @@ public class ExtensionHandler extends AbstractAnnoHandler{
 
     @Override
     protected LineMarkerInfo<?> createLineMarkerInfo(PsiAnnotation annotation, PsiMethod psiMethod, String extensionKey) {
+        LineMarkerInfo<?> lineMarkerInfo = super.createLineMarkerInfo(annotation, psiMethod, extensionKey);
+        if (lineMarkerInfo != null) return lineMarkerInfo;
+
         List<PsiElement> results = new ArrayList<>();
         Project project = psiMethod.getProject();
         // 创建一个包含项目和库的搜索范围

@@ -17,7 +17,12 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-     this is plugin of cef-jump for zcy````````````````````````````````````````````````````````````````````````````````
+     This plugin is developed based on the internal requirements of zcy company.
+      It enables code navigation in projects through sidebar clicks, specifically
+      targeting special annotations (primarily Extension, OpenAfter, OpenBefore,
+      and OpenReplace annotations). The core functionality allows clicking on annotations
+      like OpenAfter to jump to the corresponding code location marked with an Extension
+      annotation that shares the same value parameter.
   ]]></description>
 
     <extensions defaultExtensionNs="com.intellij">
