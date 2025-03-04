@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cn.yuyao"
-version = "1.4-SNAPSHOT"
+version = "1.0-release"
 
 repositories {
     mavenCentral()
