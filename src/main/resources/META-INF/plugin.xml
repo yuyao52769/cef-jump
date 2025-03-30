@@ -31,5 +31,11 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="cn.yuyao.cefjump.handler.OpenReplaceHandler"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="cn.yuyao.cefjump.handler.ExtensionHandler"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="cn.yuyao.cefjump.handler.ClsHandler"/>
+<!--        <postStartupActivity implementation="cn.yuyao.cefjump.docGen.CefIndexReadyListener"></postStartupActivity>-->
     </extensions>
+    
+    <applicationListeners>
+        <listener class="cn.yuyao.cefjump.docGen.CefDocGenListener" topic="com.intellij.openapi.project.ProjectManagerListener"></listener>
+    </applicationListeners>
+    
 </idea-plugin>

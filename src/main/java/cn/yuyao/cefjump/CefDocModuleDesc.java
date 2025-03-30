@@ -10,13 +10,26 @@ public class CefDocModuleDesc {
 
     private String module;
 
+    private String name;
+
     private String func;
+
+    private String desc;
 
     private List<OpenFunc> openFuncList;
 
+    @Override
+    public String toString() {
+        return "CefDocModuleDesc{" +
+                "className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", module='" + module + '\'' +
+                ", func='" + func + '\'' +
+                ", openFuncList=" + openFuncList +
+                '}';
+    }
 
-
-   public static class OpenFunc {
+    public static class OpenFunc {
 
        private OpenTypeEnum type;
 
@@ -37,15 +50,33 @@ public class CefDocModuleDesc {
        public void setOpenId(String openId) {
            this.openId = openId;
        }
+
+       @Override
+       public String toString() {
+           return "OpenFunc{" +
+                   "type=" + type +
+                   ", openId='" + openId + '\'' +
+                   '}';
+       }
    }
 
    public static enum OpenTypeEnum {
 
-       BEFORE,
+       BEFORE("前置"),
 
-       REPLACE,
+       REPLACE("替换"),
 
-       AFTER;
+       AFTER("后置");
+
+       private final String name;
+
+       OpenTypeEnum(String name) {
+           this.name = name;
+       }
+
+       public String getName() {
+           return name;
+       }
 
    }
 
@@ -87,5 +118,21 @@ public class CefDocModuleDesc {
 
     public void setOpenFuncList(List<OpenFunc> openFuncList) {
         this.openFuncList = openFuncList;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

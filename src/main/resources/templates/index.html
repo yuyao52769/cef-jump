@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模块嵌套展示</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .title-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .title-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            max-width: 100%;
+        }
+        .search-button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1.5rem;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-button:hover {
+            background-color: #0b5ed7;
+        }
+        :root {
+            --card-color1: #e3f2fd;
+            --card-color2: #f3e5f5;
+        }
+        .custom-card {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .module-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .collapse-icon {
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        .collapse-icon.collapsed {
+            transform: rotate(0deg);
+        }
+        .collapse-icon:not(.collapsed) {
+            transform: rotate(180deg);
+        }
+        .card-body {
+            padding: 15px 20px;
+        }
+        .function-item {
+            margin-bottom: 15px;
+        }
+        .function-title {
+            color: #34495e;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .sub-card {
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        .sub-card-header {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tag {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+            display: inline-block;
+            position: relative;
+        }
+        .tag .copy-icon {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        .tag前置 {
+            background-color: #81d4fa;
+            color: #0d47a1;
+        }
+        .tag替换 {
+            background-color: #ff8a80;
+            color: #b71c1c;
+        }
+        .tag后置 {
+            background-color: #c5e1a5;
+            color: #33691e;
+        }
+        .highlight {
+            background-color: #fff9c4;
+        }
+        .search-results {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .search-result-item {
+            cursor: pointer;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+        .search-result-item:hover {
+            background-color: #e9ecef;
+        }
+        /* 新增样式，调整Tooltip最大宽度 */
+        .tooltip {
+            --bs-tooltip-max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="title-section">
+                <h1 class="title-text">CEF框架扩展点说明书</h1>
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="搜索模块名">
+                    <button class="search-button" id="search-button">搜索</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-8 offset-md-2">
+            <div id="search-results" class="search-results"></div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-8 offset-md-2">
+            <div th:each="mainModule,iterStat : ${mainModules}" class="custom-card"
+                 th:style="${iterStat.odd}? 'background-color: var(--card-color1)' : 'background-color: var(--card-color2)'">
+                <div class="card-header">
+                    <span class="module-name text-dark" th:text="${mainModule.name}"></span>
+                    <i class="bi bi-chevron-down collapse-icon"
+                       th:classappend="${!iterStat.first}? 'collapsed'"
+                       th:attr="data-bs-target=${'#' + mainModule.id}"
+                       data-bs-toggle="collapse"></i>
+                </div>
+                <div class="collapse" th:classappend="${iterStat.first}? 'show'" th:id="${mainModule.id}">
+                    <div class="card-body">
+                        <div th:each="subModule : ${mainModule.subModules}" class="sub-card">
+                            <div class="sub-card-header">
+                                    <span>
+                                        <span class="sub-module-name" th:text="${subModule.name}"></span>
+                                        <span th:each="tag, tagStat : ${subModule.tags}"
+                                              class="tag"
+                                              th:classappend="${'tag' + tag}"
+                                              th:text="${tag}"
+                                              th:attr="data-bs-tooltip=${subModule.tagDescriptions[tagStat.index]}"
+                                              data-bs-placement="top"
+                                              data-bs-trigger="hover"
+                                              data-bs-html="true">
+                                            <i class="bi bi-clipboard copy-icon"
+                                               th:data-copy-text="${subModule.tagDescriptions[tagStat.index]}"></i>
+                                        </span>
+                                    </span>
+                                <i class="bi bi-chevron-down collapse-icon collapsed"
+                                   th:attr="data-bs-target=${'#' + subModule.id}"
+                                   data-bs-toggle="collapse"></i>
+                            </div>
+                            <div class="collapse" th:id="${subModule.id}">
+                                <div class="card-body">
+                                    <p class="small text-muted" th:text="${subModule.funcIntro}"></p>
+                                    <p th:text="'功能介绍：' + ${subModule.funcDesc}"></p>
+                                    <p th:text="'扩展点介绍：' + ${subModule.extDesc}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const collapseIcons = document.querySelectorAll('.collapse-icon');
+    collapseIcons.forEach(icon => {
+        icon.addEventListener('click', function () {
+            this.classList.toggle('collapsed');
+        });
+    });
+
+    const searchButton = document.getElementById('search-button');
+    searchButton.addEventListener('click', function () {
+        const searchInput = document.getElementById('search-input');
+        const keyword = searchInput.value.trim().toLowerCase();
+        const searchResultsDiv = document.getElementById('search-results');
+        searchResultsDiv.innerHTML = '';
+
+        document.querySelectorAll('.module-name, .sub-module-name').forEach(name => {
+            name.classList.remove('highlight');
+        });
+
+        const matchedElements = [];
+        if (keyword) {
+            document.querySelectorAll('.module-name, .sub-module-name').forEach(name => {
+                const moduleNameText = name.textContent.toLowerCase();
+                if (moduleNameText.includes(keyword)) {
+                    name.classList.add('highlight');
+                    matchedElements.push(name);
+                }
+            });
+        }
+
+        const resultsToShow = matchedElements.slice(0, 8);
+        resultsToShow.forEach(result => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('search-result-item');
+            resultItem.textContent = result.textContent;
+            resultItem.addEventListener('click', function () {
+                let currentElement = result.closest('.custom-card, .sub-card');
+                const expandAllParents = () => {
+                    if (currentElement) {
+                        const collapse = currentElement.querySelector('.collapse');
+                        if (collapse && !collapse.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(collapse, { show: true });
+                            collapse.addEventListener('shown.bs.collapse', () => {
+                                currentElement = currentElement.parentElement.closest('.custom-card, .sub-card');
+                                expandAllParents();
+                            });
+                        } else {
+                            currentElement = currentElement.parentElement.closest('.custom-card, .sub-card');
+                            expandAllParents();
+                        }
+                    } else {
+                        const targetCollapse = result.closest('.custom-card, .sub-card').querySelector('.collapse');
+                        if (!targetCollapse.classList.contains('show')) {
+                            const bsTargetCollapse = new bootstrap.Collapse(targetCollapse, { show: true });
+                            targetCollapse.addEventListener('shown.bs.collapse', () => {
+                                targetCollapse.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            });
+                        } else {
+                            targetCollapse.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                };
+                expandAllParents();
+            });
+            searchResultsDiv.appendChild(resultItem);
+        });
+
+        searchResultsDiv.style.display = resultsToShow.length > 0 ? 'block' : 'none';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-tooltip]');
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true,
+                title: tooltipTriggerEl.dataset.bsTooltip
+            });
+        });
+
+        const copyIcons = document.querySelectorAll('.copy-icon');
+        copyIcons.forEach(icon => {
+            icon.addEventListener('click', function () {
+                const textToCopy = this.dataset.copyText;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                const copyNotification = document.createElement('div');
+                copyNotification.style.position = 'fixed';
+                copyNotification.style.bottom = '20px';
+                copyNotification.style.right = '20px';
+                copyNotification.style.backgroundColor = '#0d6efd';
+                copyNotification.style.color = 'white';
+                copyNotification.style.padding = '8px 15px';
+                copyNotification.style.borderRadius = '4px';
+                copyNotification.textContent = `已复制：${textToCopy}`;
+                document.body.appendChild(copyNotification);
+                setTimeout(() => document.body.removeChild(copyNotification), 2000);
+            });
+        });
+    });
+</script>
+</body>
+</html>

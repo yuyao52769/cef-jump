@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-
+    implementation("org.thymeleaf:thymeleaf:3.1.2.RELEASE")
 }
 
 // Configure Gradle IntelliJ Plugin
