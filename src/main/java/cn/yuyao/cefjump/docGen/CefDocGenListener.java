@@ -1,10 +1,9 @@
 package cn.yuyao.cefjump.docGen;
 
 import cn.yuyao.cefjump.constant.AnnoConstant;
-import com.intellij.openapi.project.DumbService;
+import cn.yuyao.cefjump.cache.CefCacheService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
-import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -21,12 +20,12 @@ public class CefDocGenListener implements ProjectManagerListener {
     @Override
     public void projectOpened(@NotNull Project project) {
         String projectPath = project.getBasePath(); // 或 project.getProjectFilePath()
-//        DumbService dumbService = DumbService.getInstance(project);
-//        dumbService.smartInvokeLater(() -> {
-//            // 索引可用，执行生成逻辑
-//            codeGenHandler.generate(project, projectPath, AnnoConstant.TARGET_DOC_DESC_ANNO);
-//        });
         codeGenHandler.generate(project, projectPath, AnnoConstant.TARGET_DOC_DESC_ANNO);
 
+    }
+
+    @Override
+    public void projectClosed(@NotNull Project project) {
+        CefCacheService.instance.clear(project);
     }
 }
