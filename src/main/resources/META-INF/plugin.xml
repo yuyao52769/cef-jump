@@ -32,8 +32,24 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="cn.yuyao.cefjump.handler.ExtensionHandler"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="cn.yuyao.cefjump.handler.ClsHandler"/>
 <!--        <postStartupActivity implementation="cn.yuyao.cefjump.docGen.CefIndexReadyListener"></postStartupActivity>-->
+<!--        <menuItem-->
+<!--                group="EditorPopupMenu"-->
+<!--                id="CefRefreshMenuItem"-->
+<!--                text="cef-refresh"-->
+<!--                description="Trigger CEF refresh action"-->
+<!--                class="cn.yuyao.cefjump.docGen.CefRefreshAction"/>-->
     </extensions>
-    
+
+    <actions>
+        <action
+                id="CefRefreshActionId"
+                class="cn.yuyao.cefjump.docGen.CefRefreshAction"
+                text="cef-doc-refresh"
+                description="Trigger CEF refresh">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
+
     <applicationListeners>
         <listener class="cn.yuyao.cefjump.docGen.CefDocGenListener" topic="com.intellij.openapi.project.ProjectManagerListener"></listener>
     </applicationListeners>

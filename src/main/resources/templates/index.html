@@ -150,7 +150,12 @@
         }
         /* 新增样式，调整Tooltip最大宽度 */
         .tooltip {
-            --bs-tooltip-max-width: 300px;
+            --bs-tooltip-max-width: 900px;
+        }
+        .title-label {
+            font-weight: bold;
+            font-size: 1.2em;  /* 根据需求调整字体大小 */
+            margin-right: 5px; /* 可选：标题与内容间的间距 */
         }
     </style>
 </head>
@@ -208,8 +213,15 @@
                             <div class="collapse" th:id="${subModule.id}">
                                 <div class="card-body">
                                     <p class="small text-muted" th:text="${subModule.funcIntro}"></p>
-                                    <p th:text="'功能介绍：' + ${subModule.funcDesc}"></p>
-                                    <p th:text="'扩展点介绍：' + ${subModule.extDesc}"></p>
+                                    <p>
+                                        <span class="title-label">功能介绍：</span>
+                                        <span th:text="${subModule.funcDesc}"></span>
+                                    </p>
+
+                                    <p th:if="${subModule.extDesc != null && subModule.extDesc.trim() != ''}">
+                                        <span class="title-label">扩展点介绍：</span>
+                                        <span th:text="${subModule.extDesc}"></span>
+                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -5,14 +5,14 @@ plugins {
 }
 
 group = "cn.yuyao"
-version = "1.0-release"
+version = "1.4-release"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("org.thymeleaf:thymeleaf:3.1.2.RELEASE")
+    api("org.thymeleaf:thymeleaf:3.1.2.RELEASE")
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -22,7 +22,7 @@ intellij {
     type.set("IC") // Target IDE Platform
 
     plugins.set(listOf("com.intellij.java"))
-
+    // 确保将依赖打包到插件中
 }
 
 tasks {
@@ -40,6 +40,17 @@ tasks {
         sinceBuild.set("222")
         untilBuild.set("243.*")
     }
+
+
+    buildPlugin {
+        // 设置重复处理策略为排除重复项
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        // 将依赖复制到插件的 lib 目录，使用 runtimeClasspath 替代 api
+        from(configurations.runtimeClasspath) {
+            into("lib")
+        }
+    }
+
 
     signPlugin {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))

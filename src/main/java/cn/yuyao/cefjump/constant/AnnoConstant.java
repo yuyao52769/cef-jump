@@ -11,30 +11,30 @@ import java.util.List;
  */
 public class AnnoConstant {
 
-//    public static final String EXTENSION_ANNOTATION = "cn.zcy.ka.cef.method.Extension";
-//
-//    public static final String OPEN_AFTER_ANNOTATION = "cn.zcy.ka.cef.method.OpenAfter";
-//
-//    public static final String OPEN_BEFORE_ANNOTATION = "cn.zcy.ka.cef.method.OpenBefore";
-//
-//    public static final String OPEN_REPLACE_ANNOTATION = "cn.zcy.ka.cef.method.OpenReplace";
-//
-//    public static final String EXTENSION_SERVICES_METHOD = "ExtensionServices.execute";
-//
-//    public static final String TARGET_DOC_DESC_ANNO = "cn.zcy.ka.cef.method.CefDocDesc";
+    public static final String EXTENSION_ANNOTATION = "cn.zcy.ka.cef.method.Extension";
 
+    public static final String OPEN_AFTER_ANNOTATION = "cn.zcy.ka.cef.method.OpenAfter";
 
-    public static final String EXTENSION_ANNOTATION = "cn.yuyao.anno.Extension";
+    public static final String OPEN_BEFORE_ANNOTATION = "cn.zcy.ka.cef.method.OpenBefore";
 
-    public static final String OPEN_AFTER_ANNOTATION = "cn.yuyao.anno.OpenAfter";
-
-    public static final String OPEN_BEFORE_ANNOTATION = "cn.yuyao.anno.OpenBefore";
-
-    public static final String OPEN_REPLACE_ANNOTATION = "cn.yuyao.anno.OpenReplace";
+    public static final String OPEN_REPLACE_ANNOTATION = "cn.zcy.ka.cef.method.OpenReplace";
 
     public static final String EXTENSION_SERVICES_METHOD = "ExtensionServices.execute";
 
-    public static final String TARGET_DOC_DESC_ANNO = "cn.yuyao.anno.CefDocDesc";
+    public static final String TARGET_DOC_DESC_ANNO = "cn.zcy.ka.cef.method.CefDocDesc";
+
+    //==========================================================================
+//    public static final String EXTENSION_ANNOTATION = "cn.yuyao.anno.Extension";
+//
+//    public static final String OPEN_AFTER_ANNOTATION = "cn.yuyao.anno.OpenAfter";
+//
+//    public static final String OPEN_BEFORE_ANNOTATION = "cn.yuyao.anno.OpenBefore";
+//
+//    public static final String OPEN_REPLACE_ANNOTATION = "cn.yuyao.anno.OpenReplace";
+//
+//    public static final String EXTENSION_SERVICES_METHOD = "ExtensionServices.execute";
+//
+//    public static final String TARGET_DOC_DESC_ANNO = "cn.yuyao.anno.CefDocDesc";
 
 
 

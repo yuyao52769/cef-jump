@@ -2,9 +2,6 @@ package cn.yuyao.cefjump.docGen;
 
 import cn.yuyao.cefjump.CefDocModuleDesc;
 import cn.yuyao.cefjump.constant.AnnoConstant;
-import cn.yuyao.cefjump.htmlGen.HtmlGenHandler;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -12,26 +9,27 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AnnotatedElementsSearch;
-import com.intellij.psi.search.searches.AnnotatedMembersSearch;
-import com.intellij.util.Query;
-import com.intellij.util.containers.ContainerUtil;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CodeGenHandler {
 
-    // 键：项目路径（String），值：你的业务数据（String）
-    private static final Map<String, Set<String>> projectDataMap = new ConcurrentHashMap<>();
-
-    private static final Map<String, List<CefDocModuleDesc>> descMap = new ConcurrentHashMap<>();
+    public final static CodeGenHandler INSTANCE = new CodeGenHandler();
 
   public void generate(Project project, String projectPath, String targetAnno) {
-      DumbService.getInstance(project).smartInvokeLater(() -> {
-          asyncGenerate(project, projectPath, targetAnno);
-      });
+      generate(project, projectPath, targetAnno, null);
   }
+
+    public void generate(Project project, String projectPath, String targetAnno, Runnable runnable) {
+        DumbService.getInstance(project).smartInvokeLater(() -> {
+            asyncGenerate(project, projectPath, targetAnno);
+            if (runnable != null)  runnable.run();
+
+        });
+    }
 
   protected void asyncGenerate(Project project, String projectPath, String targetAnno) {
       // 1. 获取项目根目录
@@ -39,10 +37,8 @@ public class CodeGenHandler {
       if (projectDir == null) {
           throw new RuntimeException("项目目录不存在！");
       }
-      projectDataMap.putIfAbsent(projectPath, new HashSet<String>());
-      descMap.putIfAbsent(projectPath, new ArrayList<>());
-      Set<String> methodCache = projectDataMap.get(projectPath);
-      List<CefDocModuleDesc> cefDocModuleCache = descMap.get(projectPath);
+
+      List<CefDocModuleDesc> cefDocModuleCache =  new ArrayList<>();
       JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
       PsiClass[] annotationClassList = javaPsiFacade.findClasses(targetAnno, GlobalSearchScope.allScope(project));
 
@@ -52,14 +48,18 @@ public class CodeGenHandler {
                   GlobalSearchScope.allScope(project)
           ).findAll();
           List<CefDocModuleDesc> collect = annotatedMethods.stream()
-                  .filter(o -> methodCache.add(getTotalName(o)))
                   .map(o -> handlerMethod(o, targetAnno))
                   .filter(o -> o != null)
                   .collect(Collectors.toList());
         if (collect != null & collect.size() > 0) cefDocModuleCache.addAll(collect);
       }
-      HtmlGenHandler htmlGenHandler = new HtmlGenHandler();
-      htmlGenHandler.generate(cefDocModuleCache, project, projectPath);
+      StringBuilder sb = new StringBuilder();
+      for (CefDocModuleDesc moduleDesc : cefDocModuleCache) {
+          sb.append(moduleDesc.toString());
+      }
+
+      HtmlGenHandler.INSTANCE.generate(cefDocModuleCache, project, projectPath);
+
   }
 
   protected CefDocModuleDesc handlerMethod(PsiMethod method, String targetAnno) {

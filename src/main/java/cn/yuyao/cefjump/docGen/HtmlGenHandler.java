@@ -1,4 +1,4 @@
-package cn.yuyao.cefjump.htmlGen;
+package cn.yuyao.cefjump.docGen;
 
 import cn.yuyao.cefjump.CefDocModuleDesc;
 import com.intellij.openapi.project.Project;
@@ -22,27 +22,37 @@ import java.util.stream.Collectors;
  */
 public class HtmlGenHandler {
 
+    public static final HtmlGenHandler INSTANCE = new HtmlGenHandler();
+
     public void generate(List<CefDocModuleDesc> cefDocModuleCache, Project project, String projectPath) {
-        List<CefModule> cefParams = buildLeafParam(cefDocModuleCache);
-        TemplateEngine templateEngine = new TemplateEngine();
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setCharacterEncoding("UTF-8");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateEngine.setTemplateResolver(templateResolver);
+        try {
+            if (cefDocModuleCache == null || cefDocModuleCache.size() == 0) return;
+            List<CefModule> cefParams = buildLeafParam(cefDocModuleCache);
+            if (cefParams == null || cefParams.size() == 0) return;
+            TemplateEngine templateEngine = new TemplateEngine();
+            ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+            templateResolver.setPrefix("templates/");
+            templateResolver.setSuffix(".html");
+            templateResolver.setCharacterEncoding("UTF-8");
+            templateResolver.setTemplateMode(TemplateMode.HTML);
+            templateEngine.setTemplateResolver(templateResolver);
+            Context context = new Context();
+            context.setVariable("mainModules", cefParams);
+            String html = templateEngine.process("index", context);
+            try (OutputStreamWriter writer = new OutputStreamWriter(
+                    new FileOutputStream(new File(projectPath + File.separator + "output.html")),
+                    StandardCharsets.UTF_8)) {
+                writer.write(html);
+                System.out.println("HTML 文件生成成功！");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        Context context = new Context();
-        context.setVariable("mainModules", cefParams);
-        String html = templateEngine.process("index", context);
-
-        try (OutputStreamWriter writer = new OutputStreamWriter(
-                new FileOutputStream(new File(projectPath + File.separator + "output.html")),
-                StandardCharsets.UTF_8)) {
-            writer.write(html);
-            System.out.println("HTML 文件生成成功！");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            StackTraceElement[] stackTrace = e.getStackTrace();
+            String msg = e.getMessage();
+            Messages.showMessageDialog(project, "生成html报错了，报错信息为" + msg + "||||" + stackTrace,
+                    "成功", Messages.getErrorIcon());
         }
 
     }

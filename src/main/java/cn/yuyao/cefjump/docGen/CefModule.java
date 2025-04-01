@@ -1,4 +1,4 @@
-package cn.yuyao.cefjump.htmlGen;
+package cn.yuyao.cefjump.docGen;
 
 import java.util.List;
 
@@ -86,5 +86,19 @@ public class CefModule {
 
     public void setSubModules(List<CefModule> subModules) {
         this.subModules = subModules;
+    }
+
+    @Override
+    public String toString() {
+        return "CefModule{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", tags=" + tags +
+                ", tagDescriptions=" + tagDescriptions +
+                ", funcIntro='" + funcIntro + '\'' +
+                ", funcDesc='" + funcDesc + '\'' +
+                ", extDesc='" + extDesc + '\'' +
+                ", subModules=" + subModules +
+                '}';
     }
 }
