@@ -2,17 +2,19 @@ package cn.yuyao.cefjump.docGen;
 
 import cn.yuyao.cefjump.CefDocModuleDesc;
 import cn.yuyao.cefjump.constant.AnnoConstant;
+import cn.yuyao.cefjump.dto.Param;
+import cn.yuyao.cefjump.dto.ParamDesc;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.javadoc.PsiDocTag;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AnnotatedElementsSearch;
+import com.intellij.psi.util.PsiUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CodeGenHandler {
@@ -64,6 +66,17 @@ public class CodeGenHandler {
 
   protected CefDocModuleDesc handlerMethod(PsiMethod method, String targetAnno) {
       PsiAnnotation annotation = method.getAnnotation(targetAnno);
+      PsiDocComment docComment = method.getDocComment();
+      String text = docComment.getText();
+      PsiParameterList parameterList = method.getParameterList();
+      PsiParameter[] parameters = parameterList.getParameters();
+      PsiType type = parameters[0].getType();
+      PsiClass psiClass = PsiUtil.resolveClassInType(type);
+      PsiField[] fields = psiClass.getFields();
+      for (PsiField field : fields) {
+          PsiDocComment doc = field.getDocComment();
+          System.out.println(doc.getText());
+      }
       if (annotation == null) return null;
       PsiLiteralExpression moduleExp = (PsiLiteralExpression)annotation.findAttributeValue("module");
       PsiLiteralExpression nameExp = (PsiLiteralExpression)annotation.findAttributeValue("name");
@@ -106,6 +119,52 @@ public class CodeGenHandler {
       moduleDesc.setMethodName(method.getName());
       return moduleDesc;
   }
+
+  protected ParamDesc createMethodDesc(PsiMethod method) {
+      ParamDesc result = new ParamDesc();
+      Map<String, List<PsiDocTag>> methodParamDescMap = new HashMap<>();
+      PsiDocComment docComment = method.getDocComment();
+      if (docComment != null) {
+          PsiDocTag[] tags = docComment.getTags();
+          methodParamDescMap = Arrays.stream(tags).collect(Collectors.groupingBy(PsiDocTag::getName));
+      }
+      PsiType returnType = method.getReturnType();
+      if (returnType.equalsToText("void")) {
+          result.setReturnDesc(null);
+      } else {
+          List<PsiDocTag> returnDescList = methodParamDescMap.get(ParamDesc.RETURN);
+
+      }
+      PsiClass psiClass = PsiUtil.resolveClassInType(returnType);
+
+      PsiParameterList parameterList = method.getParameterList();
+      if (parameterList == null || parameterList.getParameters() == null || parameterList.getParameters().length == 1) {
+          // 说明该扩展方法没有入参
+          return null;
+      }
+      return null;
+  }
+
+
+  protected List<Param> buildAllParam(PsiMethod method, Map<String, List<PsiDocTag>> methodParamDescMap) {
+      PsiParameterList parameterList = method.getParameterList();
+      if (parameterList == null || parameterList.getParameters() == null || parameterList.getParameters().length == 1) {
+          // 说明该扩展方法没有入参
+          return null;
+      }
+      List<Param> paramList = new ArrayList<>();
+      for (PsiParameter parameter : parameterList.getParameters()) {
+          Param param = new Param();
+          String paramName = parameter.getName();
+          PsiType type = parameter.getType();
+
+          PsiClass psiClass = PsiUtil.resolveClassInType(parameter.getType());
+          psiClass.isPhysical()
+          paramList.add(param);
+      }
+      return paramList;
+  }
+
 
   public String getTotalName(PsiMethod psiMethod) {
       return psiMethod.getContainingClass().getQualifiedName()

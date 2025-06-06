@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     api("org.thymeleaf:thymeleaf:3.1.2.RELEASE")
+    api("cn.hutool:hutool-all:5.8.22")
 }
 
 // Configure Gradle IntelliJ Plugin
