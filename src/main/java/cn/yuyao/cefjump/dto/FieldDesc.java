@@ -10,7 +10,7 @@ public class FieldDesc {
     // 字段的名称
     private String name;
     // 字段本身可能是其他dto，进行递归构建
-    private List<FieldDesc> recursionList;
+    private List<FieldDesc> fieldDescList;
 
     public FieldDesc() {}
 
@@ -36,12 +36,12 @@ public class FieldDesc {
         this.name = name;
     }
 
-    public List<FieldDesc> getRecursionList() {
-        return recursionList;
+    public List<FieldDesc> getFieldDescList() {
+        return fieldDescList;
     }
 
-    public void setRecursionList(List<FieldDesc> recursionList) {
-        this.recursionList = recursionList;
+    public void setFieldDescList(List<FieldDesc> recursionList) {
+        this.fieldDescList = recursionList;
     }
 
     public String getDesc() {

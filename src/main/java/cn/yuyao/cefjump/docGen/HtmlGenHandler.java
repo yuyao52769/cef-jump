@@ -96,6 +96,7 @@ public class HtmlGenHandler {
         List<CefDocModuleDesc.OpenFunc> openFuncList = moduleDesc.getOpenFuncList();
         result.setTags(openFuncList.stream().map(o -> o.getType().getName()).collect(Collectors.toList()));
         result.setTagDescriptions(openFuncList.stream().map(o -> o.getOpenId()).collect(Collectors.toList()));
+        result.setParamDesc(moduleDesc.getParamDesc());
         return result;
     }
 }

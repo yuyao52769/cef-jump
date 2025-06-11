@@ -146,11 +146,11 @@ public class ClassUtil {
                     PsiClass reallyType = typeChecker.reallyType;
                     List<FieldDesc> cacheDescList = cacheService.takeCache(reallyType);
                     if (CollectionUtil.isNotEmpty(cacheDescList)) {
-                        fieldDesc.setRecursionList(cacheDescList);
+                        fieldDesc.setFieldDescList(cacheDescList);
                     } else {
                         List<FieldDesc> childList = new ArrayList<>();
                         doBuildFieldDesc(childList, reallyType, level++, cacheService);
-                        fieldDesc.setRecursionList(childList);
+                        fieldDesc.setFieldDescList(childList);
                         cacheService.offerCache(reallyType, childList);
                     }
                 }
