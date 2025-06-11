@@ -1,5 +1,7 @@
 package cn.yuyao.cefjump;
 
+import cn.yuyao.cefjump.dto.ParamDesc;
+
 import java.util.List;
 
 public class CefDocModuleDesc {
@@ -15,6 +17,8 @@ public class CefDocModuleDesc {
     private String func;
 
     private String desc;
+
+    private ParamDesc paramDesc;
 
     private List<OpenFunc> openFuncList;
 
@@ -134,5 +138,13 @@ public class CefDocModuleDesc {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public ParamDesc getParamDesc() {
+        return paramDesc;
+    }
+
+    public void setParamDesc(ParamDesc paramDesc) {
+        this.paramDesc = paramDesc;
     }
 }

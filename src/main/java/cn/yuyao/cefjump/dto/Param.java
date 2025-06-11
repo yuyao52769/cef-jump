@@ -5,7 +5,7 @@ import java.util.List;
 public class Param {
     // 类型
     private String reallyType;
-    // 函数入参名(cef二开需要最原始的入参名)
+    // 函数入参名(cef二开需要最原始的入参名) 返回参数不需要
     private String paramName;
     // 注释
     private String desc;

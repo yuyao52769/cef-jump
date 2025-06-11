@@ -15,6 +15,8 @@ public class CefCacheService {
 
     private static Map<String, String> HTML_CACHE = new ConcurrentHashMap<>();
 
+    private static Map<String, DescCacheService> DESC_CACHE = new ConcurrentHashMap<>();
+
     public String getCacheHtmlStr(String projectPath) {
         return HTML_CACHE.get(projectPath);
     }
@@ -29,5 +31,16 @@ public class CefCacheService {
 
     public void clear(Project project) {
         clear(project.getBasePath());
+    }
+
+    public DescCacheService getDescCacheByProject(Project project ) {
+        DescCacheService service = DESC_CACHE.get(project.getBasePath());
+        if (service != null) return service;
+        DESC_CACHE.put(project.getBasePath(), new DescCacheService());
+        return DESC_CACHE.get(project.getBasePath());
+    }
+
+    public void clearDescCacheByProject(Project project) {
+        DESC_CACHE.remove(project.getBasePath());
     }
 }
