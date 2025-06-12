@@ -76,10 +76,10 @@ public class ClassUtil {
         String paramName = parameter.getName();
         String paramDesc = methodDescMap.get(paramName);
 
-        paramEntity.setParamName(paramName);
+        paramEntity.setName(paramName);
         paramEntity.setDesc(paramDesc);
         PsiType paramType = parameter.getType();
-        paramEntity.setReallyType(paramType.getCanonicalText());
+        paramEntity.setType(paramType.getCanonicalText());
 
         PsiClass paramClass = PsiUtil.resolveClassInType(paramType);
         if (!isJavaLangWrapper(paramClass)) {
@@ -102,7 +102,7 @@ public class ClassUtil {
         if (classWrapper.getVoid()) {
             return param;
         }
-        param.setReallyType(classWrapper.getReallyTypeName());
+        param.setType(classWrapper.getReallyTypeName());
         if (classWrapper.getBaseType()) {
             return param;
         }
