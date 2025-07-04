@@ -1,350 +1,1005 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>模块嵌套展示</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        .title-section {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem 2rem;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .title-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #0d6efd;
-        }
-        .search-container {
-            display: flex;
-            align-items: center;
-        }
-        .search-input {
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            padding: 0.5rem 1rem;
-            width: 300px;
-            max-width: 100%;
-        }
-        .search-button {
-            background-color: #0d6efd;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 0.5rem 1.5rem;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-button:hover {
-            background-color: #0b5ed7;
-        }
-        :root {
-            --card-color1: #e3f2fd;
-            --card-color2: #f3e5f5;
-        }
-        .custom-card {
-            margin-bottom: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            border-bottom: 1px solid #e9ecef;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .module-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .collapse-icon {
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: transform 0.3s;
-        }
-        .collapse-icon.collapsed {
-            transform: rotate(0deg);
-        }
-        .collapse-icon:not(.collapsed) {
-            transform: rotate(180deg);
-        }
-        .card-body {
-            padding: 15px 20px;
-        }
-        .function-item {
-            margin-bottom: 15px;
-        }
-        .function-title {
-            color: #34495e;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .sub-card {
-            margin-top: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
-        }
-        .sub-card-header {
-            background-color: #f8f9fa;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .tag {
-            font-size: 0.8rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-left: 5px;
-            display: inline-block;
-            position: relative;
-        }
-        .tag .copy-icon {
-            position: absolute;
-            top: -3px;
-            right: -3px;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-        .tag前置 {
-            background-color: #81d4fa;
-            color: #0d47a1;
-        }
-        .tag替换 {
-            background-color: #ff8a80;
-            color: #b71c1c;
-        }
-        .tag后置 {
-            background-color: #c5e1a5;
-            color: #33691e;
-        }
-        .highlight {
-            background-color: #fff9c4;
-        }
-        .search-results {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            display: none;
-        }
-        .search-result-item {
-            cursor: pointer;
-            padding: 5px;
-            margin-bottom: 5px;
-        }
-        .search-result-item:hover {
-            background-color: #e9ecef;
-        }
-        /* 新增样式，调整Tooltip最大宽度 */
-        .tooltip {
-            --bs-tooltip-max-width: 900px;
-        }
-        .title-label {
-            font-weight: bold;
-            font-size: 1.2em;  /* 根据需求调整字体大小 */
-            margin-right: 5px; /* 可选：标题与内容间的间距 */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>模块嵌套展示</title>
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link
+          href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+          rel="stylesheet"
+  />
+
+  <!-- 配置 Tailwind CSS -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1677ff",
+            success: "#00b42a",
+            warning: "#ff7d00",
+            danger: "#ff4d4f",
+            info: "#1677ff",
+            "table-header": "#f5f7fa",
+            "table-row-hover": "#f2f3f5",
+            "border-color": "#e5e6eb",
+          },
+          fontFamily: {
+            inter: ["Inter", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* 表格行悬停效果 */
+    /*.tree-table-row:hover {*/
+    /*  background-color: theme("colors.table-row-hover");*/
+    /*}*/
+
+    /* 树形展开/折叠图标动画 */
+    .tree-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .tree-icon-expanded {
+      transform: rotate(90deg);
+    }
+
+    /* 类型标签样式 */
+    .type-tag {
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .collapse {
+      visibility: visible !important;
+      display: none;
+    }
+
+    .collapse.show {
+      visibility: visible !important;
+      display: block;
+    }
+
+    .type-string {
+      background-color: rgba(22, 119, 255, 0.1);
+      color: #1677ff;
+    }
+
+    .type-number {
+      background-color: rgba(0, 180, 42, 0.1);
+      color: #00b42a;
+    }
+
+    .type-boolean {
+      background-color: rgba(255, 125, 0, 0.1);
+      color: #ff7d00;
+    }
+
+    .type-object {
+      background-color: rgba(255, 77, 79, 0.1);
+      color: #ff4d4f;
+    }
+
+    .type-array {
+      background-color: rgba(153, 102, 255, 0.1);
+      color: #9966ff;
+    }
+
+    .type-null {
+      background-color: rgba(156, 163, 175, 0.1);
+      color: #6b7280;
+    }
+
+    /* 锁定表格列宽 */
+    .fixed-columns {
+      table-layout: fixed;
+    }
+
+    /* 表格列宽定义 */
+    .col-name {
+      width: 15%;
+    }
+
+    .col-type {
+      width: 35%;
+    }
+
+    .col-desc {
+      width: 50%;
+    }
+
+    .func-intro {
+      font-size: 1.15rem;
+      color: #495057;
+      margin-bottom: 20px;
+      padding: 12px 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #0d6efd;
+      font-weight: 500;
+    }
+
+    /* 名称单元格优化 */
+    .name-container {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .flex-class {
+      display: flex !important;
+    }
+
+    .collapse > td {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    /* 确保子节点有正确的缩进 */
+    .tree-table-row > td:first-child {
+      padding-left: 2.5rem;
+    }
+    .tree-table-row {
+      transition: background-color 0.2s ease;
+    }
+    .tree-table-row:hover {
+      background-color: #f0f7ff !important;
+    }
+
+    /* 修复子容器样式 */
+    .child-container > td {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    .child-container table {
+      width: 100%;
+    }
+
+    /* 新增样式 */
+    .param-section {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .param-title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 15px;
+      color: #0d6efd;
+      padding: 8px 15px;
+      background: linear-gradient(to right, rgba(13, 110, 253, 0.1), transparent);
+      border-radius: 8px;
+      position: relative;
+      display: inline-block;
+    }
+    .param-title:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 3px;
+      width: 50px;
+      background: #0d6efd;
+      border-radius: 3px;
+    }
+
+    .table-container {
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      background: white;
+    }
+
+    .card-body p {
+      margin-bottom: 12px;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .sub-card {
+      margin-top: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .sub-card:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .sub-card-header {
+      padding: 12px 15px;
+    }
+
+    .table th {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #343a40;
+    }
+    .table td {
+      font-size: 1rem;
+      vertical-align: top;
+    }
+    .table-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.05rem; /* 增大字体 */
+    }
+    .desc-cell {
+      white-space: normal;
+      font-size: 1.05rem; /* 增大字体 */
+      line-height: 1.5; /* 增加行高 */
+    }
+  </style>
+  <style>
+    .title-section {
+      background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      padding: 1.5rem 2rem;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-text {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .search-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      width: 300px;
+      max-width: 100%;
+    }
+    .search-button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 1.5rem;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .search-button:hover {
+      background-color: #0b5ed7;
+    }
+
+
+
+    :root {
+      --card-color1: #e3f2fd;
+      --card-color2: #f3e5f5;
+    }
+    .custom-card {
+      margin-bottom: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .custom-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+    .card-header {
+      border-bottom: 1px solid #e9ecef;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .module-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .collapse-icon {
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.3s;
+    }
+    .collapse-icon.collapsed {
+      transform: rotate(0deg);
+    }
+    .collapse-icon:not(.collapsed) {
+      transform: rotate(180deg);
+    }
+    .card-body {
+      padding: 15px 20px;
+    }
+    .function-item {
+      margin-bottom: 15px;
+    }
+    .function-title {
+      color: #34495e;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .sub-card {
+      margin-top: 15px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+    }
+    .sub-card-header {
+      background-color: #f8f9fa;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tag {
+      font-size: 0.9rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-left: 8px;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+    .tag:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .tag .copy-icon {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .tag前置 {
+      background-color: #81d4fa;
+      color: #0d47a1;
+    }
+    .tag替换 {
+      background-color: #ff8a80;
+      color: #b71c1c;
+    }
+    .tag后置 {
+      background-color: #c5e1a5;
+      color: #33691e;
+    }
+    .highlight {
+      background-color: #fff9c4;
+    }
+    .search-results {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      display: none;
+    }
+    .search-result-item {
+      cursor: pointer;
+      padding: 5px;
+      margin-bottom: 5px;
+    }
+    .search-result-item:hover {
+      background-color: #e9ecef;
+    }
+    /* 新增样式，调整Tooltip最大宽度 */
+    .tooltip {
+      --bs-tooltip-max-width: 900px;
+    }
+    .title-label {
+      font-weight: bold;
+      font-size: 1.2em; /* 根据需求调整字体大小 */
+      margin-right: 5px; /* 可选：标题与内容间的间距 */
+    }
+    /* 复制提示样式 */
+    .copy-notification {
+      position: fixed;
+      background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 12px;
+      z-index: 1050;
+      box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+      font-weight: 600;
+      font-size: 1.1rem;
+      animation: fadeInOut 1s ease forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(10px); }
+      20% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+  </style>
 </head>
+<!-- 在 <body> 标签上方添加 -->
+<style>
+  body {
+    background-color: #f8fafc;
+    padding-bottom: 40px;
+  }
+  .container.mt-5 {
+    margin-top: 30px !important;
+  }
+  .row.g-4 {
+    gap: 25px 0;
+  }
+</style>
 <body>
 <div class="container mt-5">
-    <div class="row g-4">
-        <div class="col-md-8 offset-md-2">
-            <div class="title-section">
-                <h1 class="title-text">CEF框架扩展点说明书</h1>
-                <div class="search-container">
-                    <input type="text" id="search-input" class="search-input" placeholder="搜索模块名">
-                    <button class="search-button" id="search-button">搜索</button>
-                </div>
-            </div>
+  <div class="row g-4">
+    <div class="col-md-8 offset-md-2">
+      <div class="title-section">
+        <h1 class="title-text">CEF框架扩展点说明书</h1>
+        <div class="search-container">
+          <input
+                  type="text"
+                  id="search-input"
+                  class="search-input"
+                  placeholder="搜索模块名"
+          />
+          <button class="search-button" id="search-button">搜索</button>
         </div>
+      </div>
     </div>
-    <div class="row g-4">
-        <div class="col-md-8 offset-md-2">
-            <div id="search-results" class="search-results"></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-8 offset-md-2">
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-8 offset-md-2">
+      <div
+              th:each="mainModule,iterStat : ${mainModules}"
+              class="custom-card"
+              th:style="${iterStat.odd}? 'background-color: var(--card-color1)' : 'background-color: var(--card-color2)'"
+      >
+        <div class="card-header">
+              <span
+                      class="module-name text-dark"
+                      th:text="${mainModule.name}"
+              ></span>
+          <i
+                  class="bi bi-chevron-down collapse-icon"
+                  th:classappend="${!iterStat.first}? 'collapsed'"
+                  th:attr="data-bs-target=${'#' + mainModule.id}"
+                  data-bs-toggle="collapse"
+          ></i>
         </div>
-    </div>
-    <div class="row g-4">
-        <div class="col-md-8 offset-md-2">
-            <div th:each="mainModule,iterStat : ${mainModules}" class="custom-card"
-                 th:style="${iterStat.odd}? 'background-color: var(--card-color1)' : 'background-color: var(--card-color2)'">
-                <div class="card-header">
-                    <span class="module-name text-dark" th:text="${mainModule.name}"></span>
-                    <i class="bi bi-chevron-down collapse-icon"
-                       th:classappend="${!iterStat.first}? 'collapsed'"
-                       th:attr="data-bs-target=${'#' + mainModule.id}"
-                       data-bs-toggle="collapse"></i>
-                </div>
-                <div class="collapse" th:classappend="${iterStat.first}? 'show'" th:id="${mainModule.id}">
-                    <div class="card-body">
-                        <div th:each="subModule : ${mainModule.subModules}" class="sub-card">
-                            <div class="sub-card-header">
-                                    <span>
-                                        <span class="sub-module-name" th:text="${subModule.name}"></span>
-                                        <span th:each="tag, tagStat : ${subModule.tags}"
-                                              class="tag"
-                                              th:classappend="${'tag' + tag}"
-                                              th:text="${tag}"
-                                              th:attr="data-bs-tooltip=${subModule.tagDescriptions[tagStat.index]}"
-                                              data-bs-placement="top"
-                                              data-bs-trigger="hover"
-                                              data-bs-html="true">
-                                            <i class="bi bi-clipboard copy-icon"
-                                               th:data-copy-text="${subModule.tagDescriptions[tagStat.index]}"></i>
-                                        </span>
-                                    </span>
-                                <i class="bi bi-chevron-down collapse-icon collapsed"
-                                   th:attr="data-bs-target=${'#' + subModule.id}"
-                                   data-bs-toggle="collapse"></i>
-                            </div>
-                            <div class="collapse" th:id="${subModule.id}">
-                                <div class="card-body">
-                                    <p class="small text-muted" th:text="${subModule.funcIntro}"></p>
-                                    <p>
-                                        <span class="title-label">功能介绍：</span>
-                                        <span th:text="${subModule.funcDesc}"></span>
-                                    </p>
+        <div
+                class="collapse"
+                th:classappend="${iterStat.first}? 'show'"
+                th:id="${mainModule.id}"
+        >
+          <div class="card-body">
+            <div
+                    th:each="subModule, subIterStat : ${mainModule.subModules}"
+                    class="sub-card"
+            >
+              <div class="sub-card-header">
+                    <span>
+                      <span
+                              class="sub-module-name"
+                              th:text="${subModule.name}"
+                      ></span>
+                      <span
+                              th:each="tag, tagStat : ${subModule.tags}"
+                              class="tag"
+                              th:classappend="${'tag' + tag}"
+                              th:text="${tag}"
+                              th:attr="data-bs-tooltip=${subModule.tagDescriptions[tagStat.index]}, data-copy-text=${subModule.tagDescriptions[tagStat.index]}"
+                              data-bs-placement="top"
+                              data-bs-trigger="hover"
+                              data-bs-html="true"
+                      >
+                        <i
+                                class="bi bi-clipboard copy-icon"
+                                th:data-copy-text="${subModule.tagDescriptions[tagStat.index]}"
+                        ></i>
+                      </span>
+                    </span>
+                <i
+                        class="bi bi-chevron-down collapse-icon collapsed"
+                        th:classappend="${!subIterStat.first}? 'collapsed'"
+                        th:attr="data-bs-target=${'#' + subModule.id}"
+                        data-bs-toggle="collapse"
+                ></i>
+              </div>
+              <div class="collapse"
+                   th:id="${subModule.id}"
+              >
+                <div class="card-body">
+                  <p
+                          class="small text-muted func-intro"
+                          th:text="${subModule.funcIntro}"
+                  ></p>
+                  <p>
+                    <span class="title-label">功能介绍：</span>
+                    <span th:text="${subModule.funcDesc}"></span>
+                  </p>
 
-                                    <p th:if="${subModule.extDesc != null && subModule.extDesc.trim() != ''}">
-                                        <span class="title-label">扩展点介绍：</span>
-                                        <span th:text="${subModule.extDesc}"></span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                  <p
+                          th:if="${subModule.extDesc != null && subModule.extDesc.trim() != ''}"
+                  >
+                    <span class="title-label">扩展点介绍：</span>
+                    <span th:text="${subModule.extDesc}"></span>
+                  </p>
+
+                  <!-- 修改返回参数部分 -->
+                  <div class="param-section" th:if="${subModule.paramDesc.returnDesc != null}">
+                    <div class="param-title">返回参数：</div>
+                    <div class="table-container">
+                      <div class="overflow-x-auto">
+                        <table class="w-full text-left fixed-columns">
+                          <colgroup>
+                            <col class="col-name" />
+                            <col class="col-type" />
+                            <col class="col-desc" />
+                          </colgroup>
+                          <thead>
+                          <tr class="bg-table-header text-gray-600">
+                            <th
+                                    class="px-4 py-3 font-medium text-sm sticky left-0 bg-table-header"
+                            >
+                              名称
+                            </th>
+                            <th class="px-4 py-3 font-medium text-sm">
+                              类型
+                            </th>
+                            <th class="px-4 py-3 font-medium text-sm">
+                              注释
+                            </th>
+                          </tr>
+                          </thead>
+                          <tbody id="tree-table-body">
+                          <!-- 使用Thymeleaf递归渲染树形结构 -->
+                          <th:block
+                                  th:if="${subModule.paramDesc.returnDesc != null}"
+                          >
+                            <!-- 调用递归模板 -->
+                            <th:block
+                                    th:replace="~{this :: treeNodes(${subModule.paramDesc.returnDesc}, 1)}"
+                            />
+                          </th:block>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
+                  </div>
+
+                  <!-- 修改接收参数部分 -->
+                  <div class="param-section" th:if="${subModule.paramDesc.paramDescList != null}">
+                    <div class="param-title">接收参数：</div>
+                    <div class="table-container">
+                      <div class="overflow-x-auto">
+                        <table class="w-full text-left fixed-columns">
+                          <colgroup>
+                            <col class="col-name" />
+                            <col class="col-type" />
+                            <col class="col-desc" />
+                          </colgroup>
+                          <thead>
+                          <tr class="bg-table-header text-gray-600">
+                            <th
+                                    class="px-4 py-3 font-medium text-sm sticky left-0 bg-table-header"
+                            >
+                              名称
+                            </th>
+                            <th class="px-4 py-3 font-medium text-sm">
+                              类型
+                            </th>
+                            <th class="px-4 py-3 font-medium text-sm">
+                              注释
+                            </th>
+                          </tr>
+                          </thead>
+                          <tbody id="tree-table-body">
+                          <!-- 使用Thymeleaf递归渲染树形结构 -->
+                          <th:block
+                                  th:if="${subModule.paramDesc.paramDescList != null}"
+                          >
+                            <!-- 调用递归模板 -->
+                            <th:block
+                                    th:replace="~{this :: treeNodes(${subModule.paramDesc.paramDescList}, 1)}"
+                            />
+                          </th:block>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- 定义Thymeleaf递归模板 -->
+<!-- 修改后的递归模板 -->
+<!-- 定义Thymeleaf递归模板 -->
+<div th:fragment="treeNodes(nodes, level)" th:remove="tag">
+  <th:block th:each="node, iterStat : ${nodes}">
+    <tr
+            th:data-id="${node.id}"
+            class="tree-table-row border-b border-border-color"
+            th:attr="data-level=${level}, data-has-children=${node.fieldDescList != null and not #lists.isEmpty(node.fieldDescList)}"
+    >
+      <td
+              th:class="'px-4 py-3 font-medium sticky left-0 bg-white table-cell'"
+              th:style="'padding-left: ' + ${level * 2} + 'rem;'"
+      >
+        <div class="flex items-center">
+          <th:block th:if="${node.fieldDescList != null and not #lists.isEmpty(node.fieldDescList)}">
+            <button
+                    class="tree-icon mr-2 text-gray-500 hover:text-primary transition-colors"
+            >
+              <i class="fa fa-angle-right"></i>
+            </button>
+          </th:block>
+          <th:block th:unless="${node.fieldDescList != null and not #lists.isEmpty(node.fieldDescList)}">
+            <span class="w-5 inline-block"></span>
+          </th:block>
+          <div class="name-container">
+            <span th:text="${node.name}"></span>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3 table-cell">
+        <span
+                th:class="'type-tag type-' + ${#strings.toLowerCase(node.type)}"
+                th:text="${node.type}"
+        ></span>
+      </td>
+      <td
+              class="px-4 py-3 text-gray-600 desc-cell"
+              th:text="${node.desc} ?: '-'"
+      ></td>
+    </tr>
+
+    <!-- 子节点容器 - 修改为直接包含在父行内 -->
+    <th:block th:if="${node.fieldDescList != null and not #lists.isEmpty(node.fieldDescList)}">
+      <tr class="child-container">
+        <td colspan="3" class="p-0">
+          <table class="w-full">
+            <tbody th:id="${node.id + '-container'}" style="display:none;">
+            <th:block th:replace="~{this :: treeNodes(${node.fieldDescList}, ${level} + 1)}" />
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </th:block>
+  </th:block>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const collapseIcons = document.querySelectorAll('.collapse-icon');
-    collapseIcons.forEach(icon => {
-        icon.addEventListener('click', function () {
-            this.classList.toggle('collapsed');
-        });
+  const collapseIcons = document.querySelectorAll(".collapse-icon");
+  collapseIcons.forEach((icon) => {
+    icon.addEventListener("click", function () {
+      this.classList.toggle("collapsed");
     });
+  });
 
-    const searchButton = document.getElementById('search-button');
-    searchButton.addEventListener('click', function () {
-        const searchInput = document.getElementById('search-input');
-        const keyword = searchInput.value.trim().toLowerCase();
-        const searchResultsDiv = document.getElementById('search-results');
-        searchResultsDiv.innerHTML = '';
+  const searchButton = document.getElementById("search-button");
+  searchButton.addEventListener("click", function () {
+    const searchInput = document.getElementById("search-input");
+    const keyword = searchInput.value.trim().toLowerCase();
+    const searchResultsDiv = document.getElementById("search-results");
+    searchResultsDiv.innerHTML = "";
 
-        document.querySelectorAll('.module-name, .sub-module-name').forEach(name => {
-            name.classList.remove('highlight');
-        });
+    document
+            .querySelectorAll(".module-name, .sub-module-name")
+            .forEach((name) => {
+              name.classList.remove("highlight");
+            });
 
-        const matchedElements = [];
-        if (keyword) {
-            document.querySelectorAll('.module-name, .sub-module-name').forEach(name => {
+    const matchedElements = [];
+    if (keyword) {
+      document
+              .querySelectorAll(".module-name, .sub-module-name")
+              .forEach((name) => {
                 const moduleNameText = name.textContent.toLowerCase();
                 if (moduleNameText.includes(keyword)) {
-                    name.classList.add('highlight');
-                    matchedElements.push(name);
+                  name.classList.add("highlight");
+                  matchedElements.push(name);
                 }
-            });
-        }
+              });
+    }
 
-        const resultsToShow = matchedElements.slice(0, 8);
-        resultsToShow.forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.classList.add('search-result-item');
-            resultItem.textContent = result.textContent;
-            resultItem.addEventListener('click', function () {
-                let currentElement = result.closest('.custom-card, .sub-card');
-                const expandAllParents = () => {
-                    if (currentElement) {
-                        const collapse = currentElement.querySelector('.collapse');
-                        if (collapse && !collapse.classList.contains('show')) {
-                            const bsCollapse = new bootstrap.Collapse(collapse, { show: true });
-                            collapse.addEventListener('shown.bs.collapse', () => {
-                                currentElement = currentElement.parentElement.closest('.custom-card, .sub-card');
-                                expandAllParents();
-                            });
-                        } else {
-                            currentElement = currentElement.parentElement.closest('.custom-card, .sub-card');
-                            expandAllParents();
-                        }
-                    } else {
-                        const targetCollapse = result.closest('.custom-card, .sub-card').querySelector('.collapse');
-                        if (!targetCollapse.classList.contains('show')) {
-                            const bsTargetCollapse = new bootstrap.Collapse(targetCollapse, { show: true });
-                            targetCollapse.addEventListener('shown.bs.collapse', () => {
-                                targetCollapse.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start'
-                                });
-                            });
-                        } else {
-                            targetCollapse.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    }
-                };
+    const resultsToShow = matchedElements.slice(0, 8);
+    resultsToShow.forEach((result) => {
+      const resultItem = document.createElement("div");
+      resultItem.classList.add("search-result-item");
+      resultItem.textContent = result.textContent;
+      resultItem.addEventListener("click", function () {
+        let currentElement = result.closest(".custom-card, .sub-card");
+        const expandAllParents = () => {
+          if (currentElement) {
+            const collapse = currentElement.querySelector(".collapse");
+            if (collapse && !collapse.classList.contains("show")) {
+              const bsCollapse = new bootstrap.Collapse(collapse, {
+                show: true,
+              });
+              collapse.addEventListener("shown.bs.collapse", () => {
+                currentElement = currentElement.parentElement.closest(
+                        ".custom-card, .sub-card"
+                );
                 expandAllParents();
-            });
-            searchResultsDiv.appendChild(resultItem);
-        });
-
-        searchResultsDiv.style.display = resultsToShow.length > 0 ? 'block' : 'none';
+              });
+            } else {
+              currentElement = currentElement.parentElement.closest(
+                      ".custom-card, .sub-card"
+              );
+              expandAllParents();
+            }
+          } else {
+            const targetCollapse = result
+                    .closest(".custom-card, .sub-card")
+                    .querySelector(".collapse");
+            if (!targetCollapse.classList.contains("show")) {
+              const bsTargetCollapse = new bootstrap.Collapse(
+                      targetCollapse,
+                      { show: true }
+              );
+              targetCollapse.addEventListener("shown.bs.collapse", () => {
+                targetCollapse.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              });
+            } else {
+              targetCollapse.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          }
+        };
+        expandAllParents();
+      });
+      searchResultsDiv.appendChild(resultItem);
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-tooltip]');
-        tooltipTriggerList.forEach(tooltipTriggerEl => {
-            new bootstrap.Tooltip(tooltipTriggerEl, {
-                html: true,
-                title: tooltipTriggerEl.dataset.bsTooltip
-            });
-        });
+    searchResultsDiv.style.display =
+            resultsToShow.length > 0 ? "block" : "none";
+  });
 
-        const copyIcons = document.querySelectorAll('.copy-icon');
-        copyIcons.forEach(icon => {
-            icon.addEventListener('click', function () {
-                const textToCopy = this.dataset.copyText;
-                const textArea = document.createElement('textarea');
-                textArea.value = textToCopy;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-
-                const copyNotification = document.createElement('div');
-                copyNotification.style.position = 'fixed';
-                copyNotification.style.bottom = '20px';
-                copyNotification.style.right = '20px';
-                copyNotification.style.backgroundColor = '#0d6efd';
-                copyNotification.style.color = 'white';
-                copyNotification.style.padding = '8px 15px';
-                copyNotification.style.borderRadius = '4px';
-                copyNotification.textContent = `已复制：${textToCopy}`;
-                document.body.appendChild(copyNotification);
-                setTimeout(() => document.body.removeChild(copyNotification), 2000);
-            });
-        });
+  document.addEventListener("DOMContentLoaded", () => {
+    const tooltipTriggerList =
+            document.querySelectorAll("[data-bs-tooltip]");
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+      new bootstrap.Tooltip(tooltipTriggerEl, {
+        html: true,
+        title: tooltipTriggerEl.dataset.bsTooltip,
+      });
     });
+
+    // 为标签添加点击复制功能
+    const tags = document.querySelectorAll(".tag");
+    tags.forEach((tag) => {
+      tag.addEventListener("click", function (e) {
+        e.stopPropagation(); // 防止事件冒泡
+
+        const textToCopy = this.dataset.copyText;
+        if (!textToCopy) return;
+
+        // 复制到剪贴板
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        // 显示复制成功提示
+        const copyNotification = document.createElement("div");
+        copyNotification.className = "copy-notification";
+        copyNotification.textContent = "复制成功"; // 只显示"复制成功"
+        copyNotification.style.left = `${e.clientX - 40}px`;
+        copyNotification.style.top = `${e.clientY - 100}px`; // 出现在鼠标上方一点
+        document.body.appendChild(copyNotification);
+
+        // 2秒后移除提示
+        setTimeout(() => {
+          document.body.removeChild(copyNotification);
+        }, 1000); // 缩短显示时间为1秒
+      });
+    });
+  });
+</script>
+
+<script>
+  // 状态管理
+  const state = {
+    expandedNodes: new Set(),
+  };
+
+  // 初始化事件监听器
+  function initEventListeners() {
+    // 点击行展开/折叠节点
+    document
+            .getElementById("tree-table-body")
+            .addEventListener("click", (e) => {
+              const row = e.target.closest("tr");
+              if (row && row.dataset.id && row.dataset.hasChildren === "true") {
+                toggleNode(row.dataset.id, row);
+              }
+            });
+  }
+
+  // 切换节点展开/折叠状态
+  function toggleNode(nodeName, rowElement) {
+    if (state.expandedNodes.has(nodeName)) {
+      state.expandedNodes.delete(nodeName);
+    } else {
+      state.expandedNodes.add(nodeName);
+    }
+
+    // 更新UI
+    updateRowState(rowElement, state.expandedNodes.has(nodeName));
+  }
+
+  // 更新行状态
+  function updateRowState(row, isExpanded) {
+    const icon = row.querySelector(".tree-icon");
+    if (icon) {
+      icon.classList.toggle("tree-icon-expanded", isExpanded);
+    }
+
+    const currentLevel = parseInt(row.dataset.level);
+    const nextLevel = currentLevel + 1;
+
+    // 显示/隐藏子节点
+    let nextRow = row.nextElementSibling;
+    while (nextRow) {
+      const rowLevel = parseInt(nextRow.dataset.level);
+
+      if (rowLevel <= currentLevel) {
+        // 遇到同级或父级节点，停止
+        break;
+      }
+
+      if (rowLevel === nextLevel) {
+        // 直接子节点
+        nextRow.style.display = isExpanded ? "" : "none";
+      } else if (rowLevel > nextLevel) {
+        // 嵌套子节点，根据父节点状态决定
+        nextRow.style.display = isExpanded ? "" : "none";
+      }
+
+      // 更新子节点的展开状态图标
+      if (isExpanded && nextRow.dataset.hasChildren === "true") {
+        const isChildExpanded = state.expandedNodes.has(nextRow.dataset.id);
+        const childIcon = nextRow.querySelector(".tree-icon");
+        if (childIcon) {
+          childIcon.classList.toggle("tree-icon-expanded", isChildExpanded);
+        }
+      }
+
+      nextRow = nextRow.nextElementSibling;
+    }
+  }
+
+  // 根据类型获取对应的CSS类
+  function getTypeClass(type) {
+    if (!type) return "null";
+
+    const lowerType = type.toLowerCase();
+
+    if (lowerType.includes("array")) return "array";
+    if (lowerType.includes("object")) return "object";
+    if (lowerType.includes("string")) return "string";
+    if (lowerType.includes("number")) return "number";
+    if (lowerType.includes("boolean")) return "boolean";
+    if (lowerType.includes("null")) return "null";
+
+    return "null";
+  }
+
+  // 初始化类型标签样式
+  function initTypeTags() {
+    document.querySelectorAll(".type-tag").forEach((tag) => {
+      const type = tag.textContent;
+      const typeClass = getTypeClass(type);
+      tag.classList.add(`type-${typeClass}`);
+    });
+  }
+
+  // 折叠所有节点
+  function collapseAllNodes() {
+    document
+            .querySelectorAll('tr[data-has-children="true"]')
+            .forEach((row) => {
+              const nodeId = row.dataset.id;
+              if (state.expandedNodes.has(nodeId)) {
+                state.expandedNodes.delete(nodeId);
+                updateRowState(row, false);
+              }
+            });
+  }
+
+  // 初始化
+  function init() {
+    initEventListeners();
+    initTypeTags();
+
+    // 添加折叠全部按钮事件
+    document
+            .getElementById("collapse-all")
+            ?.addEventListener("click", collapseAllNodes);
+  }
+
+  // 页面加载完成后初始化
+  //document.addEventListener("DOMContentLoaded", init);
+  // 替换现有的树形表格事件处理代码
+  document.addEventListener("DOMContentLoaded", function() {
+    // 树形表格展开/折叠功能
+    document.querySelectorAll('.tree-icon').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const icon = this.querySelector('i');
+        const row = this.closest('tr');
+        const containerId = row.dataset.id + '-container';
+        const container = document.getElementById(containerId);
+
+        if (container) {
+          if (container.style.display === 'none') {
+            container.style.display = 'table-row-group';
+            icon.classList.add('tree-icon-expanded');
+          } else {
+            container.style.display = 'none';
+            icon.classList.remove('tree-icon-expanded');
+          }
+        }
+      });
+    });
+
+    // 初始折叠所有子节点
+    document.querySelectorAll('.child-container tbody').forEach(container => {
+      container.style.display = 'none';
+    });
+  });
 </script>
 </body>
 </html>

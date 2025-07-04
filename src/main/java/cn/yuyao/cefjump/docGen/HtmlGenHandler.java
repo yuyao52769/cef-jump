@@ -1,6 +1,10 @@
 package cn.yuyao.cefjump.docGen;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.yuyao.cefjump.CefDocModuleDesc;
+import cn.yuyao.cefjump.dto.FieldDesc;
+import cn.yuyao.cefjump.dto.Param;
+import cn.yuyao.cefjump.dto.ParamDesc;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.thymeleaf.TemplateEngine;
@@ -10,10 +14,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,11 +25,14 @@ public class HtmlGenHandler {
 
     public static final HtmlGenHandler INSTANCE = new HtmlGenHandler();
 
+    private static int paramIndex = 0;
+
     public void generate(List<CefDocModuleDesc> cefDocModuleCache, Project project, String projectPath) {
         try {
             if (cefDocModuleCache == null || cefDocModuleCache.size() == 0) return;
             List<CefModule> cefParams = buildLeafParam(cefDocModuleCache);
             if (cefParams == null || cefParams.size() == 0) return;
+            wrapperParamId(cefParams);
             TemplateEngine templateEngine = new TemplateEngine();
             ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
             templateResolver.setPrefix("templates/");
@@ -59,7 +63,8 @@ public class HtmlGenHandler {
 
     protected List<CefModule> buildLeafParam(List<CefDocModuleDesc> cefDocModuleCache) {
         List<CefModule> mainModuleList = new ArrayList<>();
-
+        WrapperInt modelIndex = new WrapperInt();
+        modelIndex.index = 10;
         Map<String, List<CefDocModuleDesc>> collectMap = cefDocModuleCache.stream().collect(Collectors.groupingBy(CefDocModuleDesc::getModule));
         for (Map.Entry<String, List<CefDocModuleDesc>> entry : collectMap.entrySet()) {
             String moduleName = entry.getKey();
@@ -67,7 +72,7 @@ public class HtmlGenHandler {
             CefModule fatherModule = new CefModule();
             fatherModule.setId(id);
             fatherModule.setName(moduleName);
-            fatherModule.setSubModules(buildSubModule(entry.getValue()));
+            fatherModule.setSubModules(buildSubModule(entry.getValue(), modelIndex));
             mainModuleList.add(fatherModule);
         }
         return mainModuleList;
@@ -78,17 +83,18 @@ public class HtmlGenHandler {
         return Objects.hash(name) + "key";
     }
 
-    protected List<CefModule> buildSubModule(List<CefDocModuleDesc> moduleDescList) {
+    protected List<CefModule> buildSubModule(List<CefDocModuleDesc> moduleDescList, WrapperInt modelIndex) {
         List<CefModule> resultList = new ArrayList<>();
         for (int i = 0; i < moduleDescList.size(); i++) {
-            resultList.add(doBuildSubModule(moduleDescList.get(i), i));
+            resultList.add(doBuildSubModule(moduleDescList.get(i), modelIndex));
         }
         return resultList;
     }
 
-    protected CefModule doBuildSubModule(CefDocModuleDesc moduleDesc, int index) {
+    protected CefModule doBuildSubModule(CefDocModuleDesc moduleDesc, WrapperInt index) {
         CefModule result = new CefModule();
-        result.setId("subCollapse" + index + "1");
+        result.setId("subCollapse" + index.index);
+        index.index++;
         result.setName(moduleDesc.getName());
         result.setFuncDesc(moduleDesc.getFunc());
         result.setExtDesc(moduleDesc.getDesc());
@@ -98,5 +104,64 @@ public class HtmlGenHandler {
         result.setTagDescriptions(openFuncList.stream().map(o -> o.getOpenId()).collect(Collectors.toList()));
         result.setParamDesc(moduleDesc.getParamDesc());
         return result;
+    }
+
+    protected void wrapperParamId(List<CefModule> cefModules) {
+        if (CollectionUtil.isEmpty(cefModules)) return;
+        String paramIdPre = "paramId_";
+        WrapperInt index = new WrapperInt();
+        index.index = 0;
+        for (CefModule module : cefModules) {
+            List<CefModule> subModules = module.getSubModules();
+            if (CollectionUtil.isEmpty(subModules)) continue;
+            if (CollectionUtil.isNotEmpty(subModules)) {
+                for (CefModule subModule : subModules) {
+                    ParamDesc paramDesc = subModule.getParamDesc();
+                    if (paramDesc != null) {
+                        Param returnDesc = paramDesc.getReturnDesc();
+                        List<Param> paramList = paramDesc.getParamDescList();
+                        if (returnDesc != null) {
+                            doAddParamId(index, paramIdPre, Collections.singletonList(returnDesc));
+                        }
+                        if (CollectionUtil.isNotEmpty(paramList)) {
+                            doAddParamId(index, paramIdPre, paramList);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    protected void doAddParamId(WrapperInt index, String preFix, List<Param> paramList) {
+        if (CollectionUtil.isNotEmpty(paramList)) {
+            for (Param param : paramList) {
+                param.setId(preFix + index.index);
+                index.index++;
+                List<FieldDesc> fieldDescList = param.getFieldDescList();
+                if (CollectionUtil.isNotEmpty(fieldDescList)) {
+                    for (FieldDesc childDesc : fieldDescList) {
+                        childDesc.setId(preFix + index.index);
+                        index.index++;
+                        doAppDescParamId(index, preFix, childDesc.getFieldDescList());
+                    }
+                }
+            }
+        }
+    }
+
+    protected void doAppDescParamId(WrapperInt index, String preFix, List<FieldDesc> fieldDescList) {
+        if (CollectionUtil.isNotEmpty(fieldDescList)) {
+            for (FieldDesc child : fieldDescList) {
+                child.setId(preFix + index.index);
+                index.index++;
+                doAppDescParamId(index, preFix, child.getFieldDescList());
+            }
+        }
+    }
+
+    public static class WrapperInt {
+        public int index;
     }
 }

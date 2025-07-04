@@ -83,39 +83,46 @@ public class ClassUtil {
 
         PsiClass paramClass = PsiUtil.resolveClassInType(paramType);
         if (!isJavaLangWrapper(paramClass)) {
-            List<FieldDesc> cacheDescList = cacheService.takeCache(paramClass);
-            if (CollectionUtil.isNotEmpty(cacheDescList)) {
-                paramEntity.setFieldDescList(cacheDescList);
-            } else {
-                List<FieldDesc> fieldList = new ArrayList<>();
-                doBuildFieldDesc(fieldList, paramClass, 1, cacheService);
-                paramEntity.setFieldDescList(fieldList);
-                cacheService.offerCache(paramClass, fieldList);
-            }
+            List<FieldDesc> fieldList = new ArrayList<>();
+            doBuildFieldDesc(fieldList, paramClass, 1, cacheService);
+            paramEntity.setFieldDescList(fieldList);
+//            List<FieldDesc> cacheDescList = cacheService.takeCache(paramClass);
+//            if (CollectionUtil.isNotEmpty(cacheDescList)) {
+//                paramEntity.setFieldDescList(cacheDescList);
+//            } else {
+//                List<FieldDesc> fieldList = new ArrayList<>();
+//                doBuildFieldDesc(fieldList, paramClass, 1, cacheService);
+//                paramEntity.setFieldDescList(fieldList);
+//                cacheService.offerCache(paramClass, fieldList);
+//            }
         }
         return paramEntity;
     }
 
     public static Param buildReturnParam(ClassWrapper classWrapper, String desc, DescCacheService cacheService) {
         Param param = new Param();
+        param.setName("返回参数");
         param.setDesc(desc);
         if (classWrapper.getVoid()) {
-            return param;
+            return null;
         }
         param.setType(classWrapper.getReallyTypeName());
         if (classWrapper.getBaseType()) {
             return param;
         }
         PsiClass type = classWrapper.getReallyType();
-        List<FieldDesc> cacheList = cacheService.takeCache(type);
-        if (CollectionUtil.isNotEmpty(cacheList)) {
-            param.setFieldDescList(cacheList);
-        } else {
-            List<FieldDesc> fieldList = new ArrayList<>();
-            doBuildFieldDesc(fieldList, type, 1, cacheService);
-            param.setFieldDescList(fieldList);
-            cacheService.offerCache(type, fieldList);
-        }
+//        List<FieldDesc> cacheList = cacheService.takeCache(type);
+//        if (CollectionUtil.isNotEmpty(cacheList)) {
+//            param.setFieldDescList(cacheList);
+//        } else {
+//            List<FieldDesc> fieldList = new ArrayList<>();
+//            doBuildFieldDesc(fieldList, type, 1, cacheService);
+//            param.setFieldDescList(fieldList);
+//            cacheService.offerCache(type, fieldList);
+//        }
+        List<FieldDesc> fieldList = new ArrayList<>();
+        doBuildFieldDesc(fieldList, type, 1, cacheService);
+        param.setFieldDescList(fieldList);
         return param;
     }
 
@@ -125,6 +132,7 @@ public class ClassUtil {
         for (PsiField field : fields) {
             PsiDocComment fieldDocComment = field.getDocComment();
             String name = field.getName();
+            if ("serialVersionUID".equalsIgnoreCase(name)) continue;
             StringBuilder sb = new StringBuilder();
             PsiType fieldType = field.getType();
             if (fieldDocComment != null) {
@@ -144,15 +152,18 @@ public class ClassUtil {
                 ClassTypeDTO typeChecker = checkFieldType(fieldType);
                 if (!typeChecker.baseType && !typeChecker.map) {
                     PsiClass reallyType = typeChecker.reallyType;
-                    List<FieldDesc> cacheDescList = cacheService.takeCache(reallyType);
-                    if (CollectionUtil.isNotEmpty(cacheDescList)) {
-                        fieldDesc.setFieldDescList(cacheDescList);
-                    } else {
-                        List<FieldDesc> childList = new ArrayList<>();
-                        doBuildFieldDesc(childList, reallyType, level++, cacheService);
-                        fieldDesc.setFieldDescList(childList);
-                        cacheService.offerCache(reallyType, childList);
-                    }
+                    //List<FieldDesc> cacheDescList = cacheService.takeCache(reallyType);
+//                    if (CollectionUtil.isNotEmpty(cacheDescList)) {
+//                        fieldDesc.setFieldDescList(cacheDescList);
+//                    } else {
+//                        List<FieldDesc> childList = new ArrayList<>();
+//                        doBuildFieldDesc(childList, reallyType, ++level, cacheService);
+//                        fieldDesc.setFieldDescList(childList);
+//                        cacheService.offerCache(reallyType, childList);
+//                    }
+                    List<FieldDesc> childList = new ArrayList<>();
+                    doBuildFieldDesc(childList, reallyType, ++level, cacheService);
+                    fieldDesc.setFieldDescList(childList);
                 }
             }
 

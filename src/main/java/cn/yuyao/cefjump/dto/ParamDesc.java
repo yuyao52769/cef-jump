@@ -1,12 +1,13 @@
 package cn.yuyao.cefjump.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParamDesc {
     // 函数的出参
     private Param returnDesc;
     // 函数的入参
-    private List<Param> paramDescList;
+    private List<Param> paramDescList = new ArrayList<>();
 
     public static final String RETURN = "return";
 

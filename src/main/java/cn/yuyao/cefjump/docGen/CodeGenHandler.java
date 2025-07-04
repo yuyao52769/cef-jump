@@ -16,6 +16,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.javadoc.PsiDocParamRef;
 import com.intellij.psi.impl.source.javadoc.PsiDocTagImpl;
 import com.intellij.psi.impl.source.javadoc.PsiDocTokenImpl;
+import com.intellij.psi.impl.source.tree.java.PsiBinaryExpressionImpl;
+import com.intellij.psi.impl.source.tree.java.PsiPolyadicExpressionImpl;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.javadoc.PsiDocTag;
 import com.intellij.psi.javadoc.PsiDocTagValue;
@@ -72,15 +74,6 @@ public class CodeGenHandler {
 
   protected CefDocModuleDesc handlerMethod(PsiMethod method, String targetAnno, DescCacheService cacheService) {
       PsiAnnotation annotation = method.getAnnotation(targetAnno);
-      PsiParameterList parameterList = method.getParameterList();
-      PsiParameter[] parameters = parameterList.getParameters();
-      PsiType type = parameters[0].getType();
-      PsiClass psiClass = PsiUtil.resolveClassInType(type);
-      PsiField[] fields = psiClass.getFields();
-      for (PsiField field : fields) {
-          PsiDocComment doc = field.getDocComment();
-          System.out.println(doc.getText());
-      }
       if (annotation == null) return null;
       Map<String, String> methodDescMap = new HashMap<>();
       PsiDocComment docComment2 = method.getDocComment();
@@ -91,18 +84,31 @@ public class CodeGenHandler {
 
       PsiLiteralExpression moduleExp = (PsiLiteralExpression)annotation.findAttributeValue("module");
       PsiLiteralExpression nameExp = (PsiLiteralExpression)annotation.findAttributeValue("name");
-      PsiLiteralExpression funcExp = (PsiLiteralExpression)annotation.findAttributeValue("func");
-      PsiLiteralExpression descExp = (PsiLiteralExpression)annotation.findAttributeValue("desc");
+      //PsiLiteralExpression funcExp = (PsiLiteralExpression)annotation.findAttributeValue("func");
       String module = moduleExp.getValue().toString();
       String name = nameExp.getValue().toString();
-      String func = funcExp.getValue().toString();
-      String desc = descExp.getValue().toString();
+      //String func = funcExp.getValue().toString();
+      String func = getTextFromAnno(annotation, "func");
       PsiElement navigationElement = method.getNavigationElement();
-      return createModuleDesc(method, navigationElement, module, name, func, desc, methodDescMap, cacheService);
+      return createModuleDesc(method, navigationElement, module, name, func, methodDescMap, cacheService);
+  }
+
+  protected String getTextFromAnno(PsiAnnotation annotation, String key) {
+      PsiAnnotationMemberValue psiValue = annotation.findAttributeValue(key);
+      if (psiValue instanceof PsiLiteralExpression) {
+          return ((PsiLiteralExpression) psiValue).getValue().toString();
+      }
+      String text1 = psiValue.getText();
+      String cleaned = text1
+              .replaceAll("\\s*\\+\\s*", "")
+              .replaceAll("\n", "")
+              .replaceAll("\r", "")
+              .replaceAll("\"", "");
+      return cleaned;
   }
 
   protected CefDocModuleDesc createModuleDesc(PsiMethod method, PsiElement navigationElement, String module, String name,
-                                              String func, String desc, Map<String, String> methodDescMap,
+                                              String func, Map<String, String> methodDescMap,
                                               DescCacheService cacheService) {
       List<CefDocModuleDesc.OpenFunc> funcList = new ArrayList<>();
       List<AnnoConstant.OpenTypeHandler> openAnnoList = AnnoConstant.OPEN_ANNO_LIST;
@@ -125,7 +131,7 @@ public class CodeGenHandler {
       moduleDesc.setModule(module);
       moduleDesc.setName(name);
       moduleDesc.setFunc(func);
-      moduleDesc.setDesc(desc);
+      moduleDesc.setDesc(null);
       moduleDesc.setOpenFuncList(funcList);
       moduleDesc.setClassName(method.getContainingClass().getQualifiedName());
       moduleDesc.setMethodName(method.getName());

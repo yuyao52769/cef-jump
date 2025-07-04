@@ -1,8 +1,10 @@
 package cn.yuyao.cefjump.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FieldDesc {
+    private String id;
     // 字段的注释
     private String desc;
     // 字段的类型
@@ -10,7 +12,7 @@ public class FieldDesc {
     // 字段的名称
     private String name;
     // 字段本身可能是其他dto，进行递归构建
-    private List<FieldDesc> fieldDescList;
+    private List<FieldDesc> fieldDescList = new ArrayList<>();
 
     public FieldDesc() {}
 
@@ -50,5 +52,13 @@ public class FieldDesc {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
